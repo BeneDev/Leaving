@@ -8,40 +8,76 @@ public class Rocket : MonoBehaviour {
     //declaring variables
     private Rigidbody rb;
     private Vector3 velup;
+    [SerializeField] float speed = 600f; 
+    [SerializeField] float rotSpeed = 80; 
     private Vector3 rotLeft;
     private Vector3 rotRight;
+    private AudioSource sfx;
 	// Use this for initialization
 	void Start () {
         //initializing variables
         rb = GetComponent<Rigidbody>();
+        sfx = GetComponent<AudioSource>();
         //upwards veloctiy
-        velup = new Vector3(0, 600, 0) * Time.deltaTime;
+        velup = new Vector3(0f, speed, 0f) * Time.deltaTime;
         //rotation values
-        rotLeft = new Vector3(0, 0, 50) * Time.deltaTime;
-        rotRight = new Vector3(0, 0, -50) * Time.deltaTime;
+        rotLeft = new Vector3(0f, 0f, rotSpeed) * Time.deltaTime;
+        rotRight = new Vector3(0f, 0f, -rotSpeed) * Time.deltaTime;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        Processnput();
+        Rotate();
+        Thrust();
 	}
 
-    private void Processnput()
+    private void OnCollisionEnter(Collision other)
     {
-        if(Input.GetKey(KeyCode.Space))
+        switch (other.gameObject.tag)
         {
-            //makes the ship fly up
-            rb.AddRelativeForce(velup);
+            default:
+                //player dies
+                //Destroy(gameObject);
+                break;
+
+            case "Friendly":
+                //do nothing
+                break;
         }
-        if(Input.GetKey(KeyCode.A))
+    }
+
+    private void Rotate()
+    {
+        rb.freezeRotation = true; // take full control over rotation
+        if (Input.GetKey(KeyCode.A))
         {
             //rotate to the left here
             transform.Rotate(rotLeft);
         }
-        else if(Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D))
         {
             //rotate to the right here
             transform.Rotate(rotRight);
+        }
+        rb.freezeRotation = false; // looses full control over rotation
+    }
+
+    private void Thrust()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            //makes the ship fly up
+            rb.AddRelativeForce(velup);
+            //plays the sound
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                sfx.Play();
+            }
+        }
+        //stops the sound
+        else
+        {
+            sfx.Stop();
         }
     }
 }
