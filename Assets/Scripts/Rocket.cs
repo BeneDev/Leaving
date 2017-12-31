@@ -13,6 +13,7 @@ public class Rocket : MonoBehaviour {
     private Vector3 rotLeft;
     private Vector3 rotRight;
     private AudioSource sfx;
+    private Vector3 respawnPos;
 	void Start () {
         //initializing variables
         rb = GetComponent<Rigidbody>();
@@ -35,7 +36,8 @@ public class Rocket : MonoBehaviour {
         {
             default:
                 //player dies
-                transform.position = new Vector3(0f, 1.5f, 0f);
+                transform.position = respawnPos;
+                transform.position += new Vector3(0f, 1.5f, 0f);
                 transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
                 rb.velocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
@@ -43,7 +45,7 @@ public class Rocket : MonoBehaviour {
                 break;
 
             case "Friendly":
-                //do nothing
+                respawnPos = other.transform.position;
                 break;
         }
     }
