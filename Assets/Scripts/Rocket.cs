@@ -86,7 +86,7 @@ public class Rocket : MonoBehaviour {
 
     private void Rotate()
     {
-        rb.freezeRotation = true; // take full control over rotation
+        rb.angularVelocity = Vector3.zero; // take full control over rotation
         if (Input.GetKey(KeyCode.A))
         {
             //rotate to the left here
@@ -97,7 +97,6 @@ public class Rocket : MonoBehaviour {
             //rotate to the right here
             transform.Rotate(rotRight);
         }
-        rb.freezeRotation = false; // looses full control over rotation
     }
 
     private void Thrust()
