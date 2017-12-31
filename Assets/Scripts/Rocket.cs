@@ -13,7 +13,6 @@ public class Rocket : MonoBehaviour {
     private Vector3 rotLeft;
     private Vector3 rotRight;
     private AudioSource sfx;
-	// Use this for initialization
 	void Start () {
         //initializing variables
         rb = GetComponent<Rigidbody>();
@@ -25,7 +24,6 @@ public class Rocket : MonoBehaviour {
         rotRight = new Vector3(0f, 0f, -rotSpeed) * Time.deltaTime;
 	}
 	
-	// Update is called once per frame
 	void Update () {
         Rotate();
         Thrust();
@@ -37,6 +35,10 @@ public class Rocket : MonoBehaviour {
         {
             default:
                 //player dies
+                transform.position = new Vector3(0f, 1.5f, 0f);
+                transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
                 //Destroy(gameObject);
                 break;
 
