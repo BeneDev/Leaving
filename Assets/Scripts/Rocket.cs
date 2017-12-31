@@ -18,7 +18,12 @@ public class Rocket : MonoBehaviour {
     private int level;
     enum State {Alive, Dying, Transcending}
     State state;
-	void Start () {
+    [SerializeField] AudioClip thrust;
+    [SerializeField] AudioClip death;
+
+    [SerializeField] ParticleSystem smoke;
+	void Start ()
+    {
         //initializing variables
         rb = GetComponent<Rigidbody>();
         sfx = GetComponent<AudioSource>();
@@ -31,15 +36,12 @@ public class Rocket : MonoBehaviour {
         state = State.Alive;
 	}
 	
-	void Update () {
+	void Update ()
+    {
         if (state == State.Alive || state == State.Transcending)
         {
             Rotate();
             Thrust();
-        }
-        else
-        {
-            sfx.Stop();
         }
 	}
 
@@ -50,6 +52,8 @@ public class Rocket : MonoBehaviour {
         {
             default:
                 //player respawns
+                sfx.Stop();
+                sfx.PlayOneShot(death);
                 state = State.Dying;
                 Invoke("Respawn", 0.8f);
                 break;
@@ -108,13 +112,14 @@ public class Rocket : MonoBehaviour {
             //plays the sound
             if (!sfx.isPlaying)
             {
-                sfx.Play();
+                sfx.PlayOneShot(thrust);
             }
         }
         //stops the sound
         else
         {
             sfx.Stop();
+            smoke.Play();
         }
     }
 }
