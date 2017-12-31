@@ -43,6 +43,13 @@ public class Rocket : MonoBehaviour {
             Rotate();
             Thrust();
         }
+        else
+        {
+            if (smoke.isPlaying)
+            {
+                smoke.Stop();
+            }
+        }
 	}
 
     private void OnCollisionEnter(Collision other)
@@ -107,6 +114,10 @@ public class Rocket : MonoBehaviour {
     {
         if (Input.GetKey(KeyCode.Space))
         {
+            if (!smoke.isPlaying)
+            {
+                smoke.Play();
+            }
             //makes the ship fly up
             rb.AddRelativeForce(velup);
             //plays the sound
@@ -115,11 +126,13 @@ public class Rocket : MonoBehaviour {
                 sfx.PlayOneShot(thrust);
             }
         }
-        //stops the sound
         else
         {
             sfx.Stop();
-            smoke.Play();
+            if(smoke.isPlaying)
+            {
+                smoke.Stop();
+            }
         }
     }
 }
