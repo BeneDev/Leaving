@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Rocket : MonoBehaviour {
 
@@ -14,6 +15,9 @@ public class Rocket : MonoBehaviour {
     private Vector3 rotRight;
     private AudioSource sfx;
     private Vector3 respawnPos;
+    private int level;
+    enum State {Alive, Dying, Transcending}
+    State state;
 	void Start () {
         //initializing variables
         rb = GetComponent<Rigidbody>();
@@ -23,31 +27,61 @@ public class Rocket : MonoBehaviour {
         //rotation values
         rotLeft = new Vector3(0f, 0f, rotSpeed) * Time.deltaTime;
         rotRight = new Vector3(0f, 0f, -rotSpeed) * Time.deltaTime;
+        level = 0;
+        state = State.Alive;
 	}
 	
 	void Update () {
-        Rotate();
-        Thrust();
+        if (state == State.Alive || state == State.Transcending)
+        {
+            Rotate();
+            Thrust();
+        }
+        else
+        {
+            sfx.Stop();
+        }
 	}
 
     private void OnCollisionEnter(Collision other)
     {
+        if(state != State.Alive) { return; } //ignore collisions when dead or transcending
         switch (other.gameObject.tag)
         {
             default:
-                //player dies
-                transform.position = respawnPos;
-                transform.position += new Vector3(0f, 1.5f, 0f);
-                transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
-                rb.velocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-                //Destroy(gameObject);
+                //player respawns
+                state = State.Dying;
+                Invoke("Respawn", 0.8f);
                 break;
 
             case "Friendly":
+                //Sets the Point as Respawn position
                 respawnPos = other.transform.position;
                 break;
+
+            case "Finish":
+                //adds one to the level count, prevents the player from moving and loads next level
+                level++;
+                state = State.Transcending;
+                Invoke("LoadNextLevel", 0.8f);
+                break;
         }
+    }
+
+    private void Respawn()
+    {
+        transform.position = respawnPos;
+        transform.position += new Vector3(0f, 1.5f, 0f);
+        transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        state = State.Alive;
+    }
+
+    private void LoadNextLevel()
+    {
+        SceneManager.LoadScene(level);
+        state = State.Alive;
     }
 
     private void Rotate()
@@ -73,7 +107,7 @@ public class Rocket : MonoBehaviour {
             //makes the ship fly up
             rb.AddRelativeForce(velup);
             //plays the sound
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (!sfx.isPlaying)
             {
                 sfx.Play();
             }
