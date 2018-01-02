@@ -10,7 +10,8 @@ public class Rocket : MonoBehaviour {
     private Rigidbody rb;
     private Vector3 velup;
     [SerializeField] float speed = 600f; 
-    [SerializeField] float rotSpeed = 80; 
+    [SerializeField] float rotSpeed = 80;
+    [SerializeField] float levelLoadDelay;
     private Vector3 rotLeft;
     private Vector3 rotRight;
     private AudioSource sfx;
@@ -74,7 +75,7 @@ public class Rocket : MonoBehaviour {
                 //adds one to the level count, prevents the player from moving and loads next level
                 level++;
                 state = State.Transcending;
-                Invoke("LoadNextLevel", 0.8f);
+                Invoke("LoadNextLevel", levelLoadDelay);
                 break;
         }
     }
