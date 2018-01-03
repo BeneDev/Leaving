@@ -9,6 +9,7 @@ public class Rocket : MonoBehaviour {
     //declaring variables
     private Rigidbody rb;
     private Vector3 velup;
+    private bool debug = false; // you cant die in debug mode and can jump to the next level with " L"
     [SerializeField] float speed = 600f; 
     [SerializeField] float rotSpeed = 80;
     [SerializeField] float levelLoadDelay;
@@ -17,6 +18,7 @@ public class Rocket : MonoBehaviour {
     private AudioSource sfx;
     private Vector3 respawnPos;
     private int level;
+    [SerializeField] int maxLevel;
     enum State {Alive, Dying, Transcending}
     State state;
     [SerializeField] AudioClip thrust;
@@ -34,6 +36,7 @@ public class Rocket : MonoBehaviour {
         rotLeft = new Vector3(0f, 0f, rotSpeed) * Time.deltaTime;
         rotRight = new Vector3(0f, 0f, -rotSpeed) * Time.deltaTime;
         level = 0;
+        maxLevel = 0;
         state = State.Alive;
 	}
 	
@@ -51,7 +54,11 @@ public class Rocket : MonoBehaviour {
                 smoke.Stop();
             }
         }
-	}
+        if (Debug.isDebugBuild)
+        {
+            Debugging();
+        }
+}
 
     private void OnCollisionEnter(Collision other)
     {
@@ -60,10 +67,13 @@ public class Rocket : MonoBehaviour {
         {
             default:
                 //player respawns
-                sfx.Stop();
-                sfx.PlayOneShot(death);
-                state = State.Dying;
-                Invoke("Respawn", 0.8f);
+                if (!debug)
+                {
+                    sfx.Stop();
+                    sfx.PlayOneShot(death);
+                    state = State.Dying;
+                    Invoke("Respawn", 0.8f);
+                }
                 break;
 
             case "Friendly":
@@ -80,6 +90,20 @@ public class Rocket : MonoBehaviour {
         }
     }
 
+    private void Debugging()
+    {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            debug = !debug;
+        }
+        if (Input.GetKeyDown(KeyCode.L) && debug)
+        {
+            level++;
+            state = State.Transcending;
+            Invoke("LoadNextLevel", levelLoadDelay);
+        }
+    }
+
     private void Respawn()
     {
         transform.position = respawnPos;
@@ -92,7 +116,14 @@ public class Rocket : MonoBehaviour {
 
     private void LoadNextLevel()
     {
-        SceneManager.LoadScene(level);
+        if(level < maxLevel)
+        {
+            SceneManager.LoadScene(level);
+        }
+        else
+        {
+            print("You finished the Game!");
+        }
         state = State.Alive;
     }
 
