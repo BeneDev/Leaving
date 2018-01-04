@@ -17,8 +17,8 @@ public class Rocket : MonoBehaviour {
     private Vector3 rotRight;
     private AudioSource sfx;
     private Vector3 respawnPos;
-    private int level;
-    [SerializeField] int maxLevel;
+    private int currentLevel;
+    private int maxLevel;
     enum State {Alive, Dying, Transcending}
     State state;
     [SerializeField] AudioClip thrust;
@@ -35,10 +35,11 @@ public class Rocket : MonoBehaviour {
         //rotation values
         rotLeft = new Vector3(0f, 0f, rotSpeed) * Time.deltaTime;
         rotRight = new Vector3(0f, 0f, -rotSpeed) * Time.deltaTime;
-        level = 0;
-        maxLevel = 0;
         state = State.Alive;
-	}
+        currentLevel = SceneManager.GetActiveScene().buildIndex;
+        maxLevel = SceneManager.sceneCountInBuildSettings-1;
+
+    }
 	
 	void Update ()
     {
@@ -83,7 +84,6 @@ public class Rocket : MonoBehaviour {
 
             case "Finish":
                 //adds one to the level count, prevents the player from moving and loads next level
-                level++;
                 state = State.Transcending;
                 Invoke("LoadNextLevel", levelLoadDelay);
                 break;
@@ -98,7 +98,6 @@ public class Rocket : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.L) && debug)
         {
-            level++;
             state = State.Transcending;
             Invoke("LoadNextLevel", levelLoadDelay);
         }
@@ -116,9 +115,10 @@ public class Rocket : MonoBehaviour {
 
     private void LoadNextLevel()
     {
-        if(level < maxLevel)
+        if(currentLevel < maxLevel)
         {
-            SceneManager.LoadScene(level);
+            currentLevel++;
+            SceneManager.LoadScene(currentLevel);
         }
         else
         {
