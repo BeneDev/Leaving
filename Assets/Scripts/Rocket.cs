@@ -15,12 +15,14 @@ public class Rocket : MonoBehaviour {
     [SerializeField] float levelLoadDelay;
     private Vector3 rotLeft;
     private Vector3 rotRight;
+    private Vector3 turnRot;
     private AudioSource sfx;
     private Vector3 respawnPos;
     private int currentLevel;
     private int maxLevel;
     enum State {Alive, Dying, Transcending}
     State state;
+    private bool lookLeft = false;
     [SerializeField] AudioClip thrust;
     [SerializeField] AudioClip death;
 
@@ -35,6 +37,7 @@ public class Rocket : MonoBehaviour {
         //rotation values
         rotLeft = new Vector3(0f, 0f, rotSpeed) * Time.deltaTime;
         rotRight = new Vector3(0f, 0f, -rotSpeed) * Time.deltaTime;
+        turnRot = new Vector3(0f, 100, 0) * Time.deltaTime;
         state = State.Alive;
         currentLevel = SceneManager.GetActiveScene().buildIndex;
         maxLevel = SceneManager.sceneCountInBuildSettings-1;
@@ -55,11 +58,32 @@ public class Rocket : MonoBehaviour {
                 smoke.Stop();
             }
         }
+        CheckToTurn();
         if (Debug.isDebugBuild)
         {
             Debugging();
         }
 }
+
+    void CheckToTurn()
+    {
+        if (rb.velocity.x < -5) //&& lookLeft == false)
+        {
+            transform.localScale = new Vector3(-1f, 1f, 1f);
+            lookLeft = true;
+        }
+        else if (rb.velocity.x > 5) //&& lookLeft == true)
+        {
+            transform.localScale = new Vector3(1f, 1f, 1f);
+            lookLeft = false;
+        }
+    }
+
+    void TurnAstronaut(int direction) // NOT USED - direction should be -1 for turning to the left and 1 for turning to the right
+    {
+        transform.Rotate(turnRot*direction);
+    }
+    
 
     private void OnCollisionEnter(Collision other)
     {
@@ -110,6 +134,7 @@ public class Rocket : MonoBehaviour {
         transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
         rb.velocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        transform.localScale = new Vector3(1f, 1f, 1f);
         state = State.Alive;
     }
 
