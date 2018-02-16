@@ -6,6 +6,7 @@ public class CameraController : MonoBehaviour {
     private Rocket player;
     private float offX;
     private float offY;
+
     // Use this for initialization
     void Start () {
         player = FindObjectOfType<Rocket>();

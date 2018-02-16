@@ -20,6 +20,7 @@ public class Rocket : MonoBehaviour {
     private Vector3 respawnPos;
     private int currentLevel;
     private int maxLevel;
+    private CameraController camera;
     enum State {Alive, Dying, Transcending}
     State state;
     private bool lookLeft = false;
@@ -41,6 +42,7 @@ public class Rocket : MonoBehaviour {
         state = State.Alive;
         currentLevel = SceneManager.GetActiveScene().buildIndex;
         maxLevel = SceneManager.sceneCountInBuildSettings-1;
+        camera = Camera.main.GetComponent<CameraController>(); ;
 
     }
 	
@@ -70,11 +72,13 @@ public class Rocket : MonoBehaviour {
         if (rb.velocity.x < -5) //&& lookLeft == false)
         {
             transform.localScale = new Vector3(-1f, 1f, 1f);
+            //camera.transform.Rotate(new Vector3(0f, 180f, 0f));
             lookLeft = true;
         }
         else if (rb.velocity.x > 5) //&& lookLeft == true)
         {
             transform.localScale = new Vector3(1f, 1f, 1f);
+            //camera.transform.Rotate(new Vector3(0f, 180f, 0f));
             lookLeft = false;
         }
     }
